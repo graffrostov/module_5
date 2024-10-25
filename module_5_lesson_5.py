@@ -19,6 +19,9 @@ class UrTube:
     def __str__(self):
         return 'Urban university Tube'
 
+    # def __contains__(self, item):
+    #     return item in UrTube.videos.title
+
 # ___________________________________________________________________________________________________________________
 # Метод register, который принимает три аргумента:
 # nickname, password, age, и добавляет пользователя в список,
@@ -26,7 +29,7 @@ class UrTube:
 # Если существует, выводит на экран: "Пользователь {nickname} уже существует".
 # После регистрации, вход выполняется автоматически.
 
-    def register(self, nickname, password, age):
+    def register(self, nickname:str, password:str, age:int):
         password = hash(password)
         for user in UrTube.users:
             if user.nickname == nickname:
@@ -43,13 +46,13 @@ class UrTube:
 # Если такой пользователь существует, то current_user меняется на найденного.
 # Помните, что password передаётся в виде строки, а сравнивается по хэшу.
 
-    def log_in(self, nickname, password):
+    def log_in(self, nickname:str, password:str):
         password = hash(password)
         find = False
         for user in UrTube.users:
             if nickname == user.nickname and password == user.password:
-                UrTube.current_user = nickname
-                print(f'Вход в аккаунт выполнен {nickname}')
+                UrTube.current_user = user
+                print(f'Вход в аккаунт выполнен {user.nickname}')
                 find = True
         if not find:
             print('Неверное сочетание логина и пароля')
@@ -69,8 +72,10 @@ class UrTube:
 
     def add(self, *videolist:object):
         for video in videolist:
-            if video not in UrTube.videos:
+            if not any (video.title == search_vid.title for search_vid in UrTube.videos):
                 UrTube.videos.append(video)
+            # else:
+            #     print('Видео с таким названием уже существует')
 
 # ___________________________________________________________________________________________________________________
 # Метод get_videos, который принимает поисковое слово и возвращает
@@ -108,7 +113,7 @@ class UrTube:
 # "Вам нет 18 лет, пожалуйста покиньте страницу"
 # После воспроизведения нужно выводить: "Конец видео"
 
-    def watch_video(self, watch_video, start_time = 0):
+    def watch_video(self, watch_video:str, start_time:int = 0):
 
         if UrTube.current_user is None:
             print('Войдите в аккаунт, чтобы смотреть видео')
@@ -127,8 +132,8 @@ class UrTube:
                 video.time_now = start_time
                 print(f'Идёт показ видео: {watch_video}. Просмотр начался с {video.time_now} секунды')
                 for watch in range(video.time_now, video.duration):
-                    video.time_now += 1
                     sleep(1)
+                    video.time_now += 1
                     print(video.time_now, end=' ')
                 print('Конец видео')
                 video.time_now = 0
@@ -142,7 +147,7 @@ class Video:
 # duration(продолжительность, секунды),
 # time_now(секунда остановки (изначально 0)),
 # adult_mode(ограничение по возрасту, bool (False по умолчанию))
-    def __init__(self, title:str, duration:int, time_now = 0, adult_mode = False):
+    def __init__(self, title:str, duration:int, time_now:int = 0, adult_mode:bool = False):
         self.title = title
         self.duration = duration
         self.time_now = time_now
@@ -150,6 +155,9 @@ class Video:
 
     def __str__(self):
         return  self.title
+    #
+    # def __contains__(self, item):
+    #     return item.title in UrTube.videos.title
 # ___________________________________________________________________________________________________________________
 
 
@@ -159,7 +167,7 @@ class User:
 # Атрибуты: nickname(имя пользователя, строка),
 # password(в хэшированном виде, число),
 # age(возраст, число)
-    def __init__(self, nickname, password, age):
+    def __init__(self, nickname:str, password:str, age:int):
         self.nickname = nickname
         self.password = password
         self.age = age
@@ -176,6 +184,7 @@ v2 = Video('Для чего девушкам парень программист
 
 # Добавление видео
 ur.add(v1, v2)
+
 
 # Проверка поиска
 print(ur.get_videos('лучший'))
@@ -202,6 +211,12 @@ print(ur.get_videos('карась'))
 ur.log_out()
 ur.log_in('vasya_pupkin', 'lolkekcheburek')
 ur.watch_video('Лучший язык программирования 2024 года', 185)
+
+v1 = Video('Лучший язык программирования 2024 года', 20)
+v2 = Video('Для чего девушкам парень программист?', 120, adult_mode=True)
+ur.add(v1, v2)
+ur.add(v1, v2)
+
 ur.log_out()
 
 
